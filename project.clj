@@ -5,7 +5,5 @@
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [cli-matic "0.3.6"]
                  [clj-time "0.15.0"]
-                 [com.taoensso/encore "2.108.1"]
-                 [fancy "0.2.3"]
                  [io.jesi/backpack "3.4.1"]
                  [org.martinklepsch/clj-http-lite "0.4.1"]])

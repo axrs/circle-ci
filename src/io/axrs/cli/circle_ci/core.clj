@@ -3,7 +3,7 @@
     [cli-matic.core :as cli]
     [clojure.string :as string]
     [com.rpl.specter :as sp]
-    [fancy.ansi :as ansi]
+    [io.axrs.cli-tools.ansi :as ansi]
     [io.axrs.cli-tools.http :as http]
     [io.axrs.cli-tools.print :as print]
     [io.axrs.cli-tools.time :as time]
@@ -92,9 +92,9 @@
        clojure.pprint/pprint))
 
 (defonce ^:private cli-config
-  {:app      {:command     "jci"
-              :description "A JESI Encamp CircleCI CLI"
-              :version     "0.1"}
+  {:app      {:command     "circle-ci"
+              :description "A CircleCI CLI"
+              :version     "0.0.1"}
    :commands [{:command     "cols"
                :description ["Prints a list of columns available for use in tabular outputs"]
                :runs        cols}

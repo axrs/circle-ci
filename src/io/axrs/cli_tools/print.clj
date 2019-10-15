@@ -1,14 +1,10 @@
 (ns io.axrs.cli-tools.print
   (:require
-    [clojure.string :as str]
-    [glow.ansi :as ansi]))
-
-(defn- strip-ansi [s]
-  (str/replace s #"\e\[.*?m" ""))
+    [io.axrs.cli-tools.ansi :as ansi]))
 
 (defn- padded [width v]
   (let [v (str v)
-        ansi-offset (- width (count (strip-ansi v)))
+        ansi-offset (- width (count (ansi/strip v)))
         padding (max width (+ (count v) ansi-offset))]
     (format (str "%-" padding "s") v)))
 
