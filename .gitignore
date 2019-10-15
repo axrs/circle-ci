@@ -18,3 +18,6 @@
 .idea/modules
 *.iml
 .idea/replstate.xml
+
+pom.xml
+target/
