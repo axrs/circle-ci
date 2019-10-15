@@ -1,9 +1,9 @@
 (ns io.axrs.cli.circle-ci.core
   (:require
     [cli-matic.core :as cli]
-    [clojure.string :as string]
     [com.rpl.specter :as sp]
     [io.axrs.cli-tools.ansi :as ansi]
+    [io.axrs.cli-tools.env :as env]
     [io.axrs.cli-tools.http :as http]
     [io.axrs.cli-tools.print :as print]
     [io.axrs.cli-tools.time :as time]
@@ -13,8 +13,7 @@
   (:gen-class))
 
 (defn- token []
-  (let [token (System/getenv "CIRCLECI_TOKEN")]
-    (when-not (string/blank? token) token)))
+  (env/get "CIRCLECI_TOKEN"))
 
 (defn- get-recent [& [limit]]
   (try+
