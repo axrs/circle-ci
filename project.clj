@@ -9,4 +9,6 @@
                  [com.taoensso/encore "2.108.1"]
                  [io.jesi/backpack "3.4.1"]
                  [org.clojure/clojure "1.10.1"]
-                 [org.martinklepsch/clj-http-lite "0.4.1"]])
+                 [org.martinklepsch/clj-http-lite "0.4.1"]]
+  :deploy-repositories [["clojars" {:url           "https://clojars.org/repo"
+                                    :sign-releases false}]])
