@@ -9,8 +9,7 @@
     [io.axrs.cli-tools.time :as time]
     [io.jesi.backpack :as bp]
     [slingshot.slingshot :refer [try+ throw+]]
-    [taoensso.encore :refer [assoc-some]])
-  (:gen-class))
+    [taoensso.encore :refer [assoc-some]]))
 
 (defn- token []
   (env/get "CIRCLECI_TOKEN"))
