@@ -37,3 +37,8 @@
        (doseq [row rows]
          (println (fmt-row " | " row)))))))
 
+(defn clear-screen []
+  ;Clear
+  (print (str (char 27) "[2J"))
+  ;Move cursor to start
+  (print (str (char 27) "[;H")))
