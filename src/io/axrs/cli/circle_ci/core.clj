@@ -76,15 +76,17 @@
 (defn- recent [{:keys [limit cols extra-cols watch]
                 :or   {cols default-cols}
                 :as   params}]
-  (->> (get-recent limit)
-       :body
-       clean-results
-       (filter-by-params params)
-       (print/table colorize (concat cols extra-cols)))
-  (when (some-> watch pos?)
-    (Thread/sleep (* 1000 watch))
-    (print/clear-screen)
-    (recent params)))
+  (let [watch? (some-> watch pos?)]
+    (when watch?
+      (print/clear-screen))
+    (->> (get-recent limit)
+         :body
+         clean-results
+         (filter-by-params params)
+         (print/table colorize (concat cols extra-cols)))
+    (when watch?
+      (Thread/sleep (* 1000 watch))
+      (recur params))))
 
 (defn- cols [{:as params}]
   (->> (get-recent 1)
@@ -97,7 +99,7 @@
 (defonce ^:private cli-config
   {:app      {:command     "circle-ci"
               :description "A CircleCI CLI"
-              :version     "0.1.0"}
+              :version     "0.1.1"}
    :commands [{:command     "cols"
                :description ["Prints a list of columns available for use in tabular outputs"]
                :runs        cols}

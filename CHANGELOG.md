@@ -1,3 +1,9 @@
+# 0.1.1
+
+Fixed:
+* Screen now clears when watch arg is specified for recent list
+* Recent now uses recur instead to save on call stack
+
 # 0.1.0
 
 Added:
