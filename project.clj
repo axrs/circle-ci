@@ -1,4 +1,4 @@
-(defproject io.axrs.cli/circle-ci "0.1.0"
+(defproject io.axrs.cli/circle-ci "0.1.1"
   :description "A CircleCI CLI"
   :license "Eclipse Public License - v 2.0"
   :url "https://github.com/axrs/circle-ci"
