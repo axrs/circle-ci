@@ -73,14 +73,18 @@
 (defonce ^:private default-cols
   [:status :queued-at :run-time :reponame :branch :job-name :subject :build-url])
 
-(defn- recent [{:keys [limit cols extra-cols]
+(defn- recent [{:keys [limit cols extra-cols watch]
                 :or   {cols default-cols}
                 :as   params}]
   (->> (get-recent limit)
        :body
        clean-results
        (filter-by-params params)
-       (print/table colorize (concat cols extra-cols))))
+       (print/table colorize (concat cols extra-cols)))
+  (when (some-> watch pos?)
+    (Thread/sleep (* 1000 watch))
+    (print/clear-screen)
+    (recent params)))
 
 (defn- cols [{:as params}]
   (->> (get-recent 1)
@@ -93,7 +97,7 @@
 (defonce ^:private cli-config
   {:app      {:command     "circle-ci"
               :description "A CircleCI CLI"
-              :version     "0.0.1"}
+              :version     "0.1.0"}
    :commands [{:command     "cols"
                :description ["Prints a list of columns available for use in tabular outputs"]
                :runs        cols}
@@ -118,7 +122,10 @@
                               :type   :edn}
                              {:option "extra-cols"
                               :as     "Extra columns to print (appended to the end of cols)"
-                              :type   :edn}]
+                              :type   :edn}
+                             {:option "watch"
+                              :as     "The number of seconds to wait before refresh"
+                              :type   :int}]
                :runs        recent}]})
 
 (defn -main [& args]
