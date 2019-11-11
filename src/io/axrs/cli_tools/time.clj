@@ -25,7 +25,7 @@
 (defn ->wall-str [utc-date-time]
   (when utc-date-time
     (f/unparse
-      (f/formatter-local "yyyy-MM-dd HH:mm:ssZZ")
+      (f/formatter-local "yyyy-MM-dd HH:mm:ss")
       (t/to-time-zone utc-date-time (t/default-time-zone)))))
 
 (defn ->date-time [str]
