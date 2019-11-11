@@ -37,7 +37,4 @@
          (println (fmt-row " | " row)))))))
 
 (defn clear-screen []
-  ;Clear
-  (print (str (char 27) "[2J"))
-  ;Move cursor to start
-  (print (str (char 27) "[;H")))
+  (print "\033[2J\033[3J\033[1;1H"))
