@@ -2,9 +2,20 @@
   (:require
     [io.axrs.cli-tools.ansi :as ansi]))
 
+(defn- ansi-width [v]
+  (if (satisfies? ansi/TermText v)
+    (ansi/width v)
+    (count (ansi/strip (str v)))))
+
+(defn- ansi-value [v]
+  (str (if (satisfies? ansi/TermText v)
+         (ansi/value v)
+         v)))
+
 (defn- padded [width v]
-  (let [v (str v)
-        ansi-offset (- width (count (ansi/strip v)))
+  (let [text-width (ansi-width v)
+        v (ansi-value v)
+        ansi-offset (- width text-width)
         padding (max width (+ (count v) ansi-offset))]
     (format (str "%-" padding "s") v)))
 
@@ -22,7 +33,7 @@
    (when (seq rows)
      (let [widths (map
                     (fn [k]
-                      (apply max (count (str k)) (map #(count (str (get % k))) rows)))
+                      (apply max (count (str k)) (map #(ansi-width (get % k)) rows)))
                     ks)
            rows (if formatter
                   (map formatter rows)

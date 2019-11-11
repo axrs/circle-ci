@@ -23,9 +23,11 @@
       (http/print-error response "Please ensure your CIRCLE_CI token is correct")
       (throw+))))
 
-(defn- utc-dates->local [{:keys [start-time stop-time queued-at] :as result} now]
+(defn- utc-dates->local [{:keys [start-time stop-time queued-at build-url workflow-url] :as result} now]
   (let [[start-time stop-time queued-at] (map time/->date-time [start-time stop-time queued-at])]
     (assoc result
+      :build-link (ansi/hyperlink build-url "Build")
+      :workflow-link (ansi/hyperlink workflow-url "Workflow")
       :run-time (some-> start-time (time/humanized-interval (or stop-time now)))
       :start-time (time/->wall-str start-time)
       :stop-time (time/->wall-str stop-time)
@@ -71,7 +73,7 @@
       results)))
 
 (defonce ^:private default-cols
-  [:status :queued-at :run-time :reponame :branch :job-name :subject :build-url])
+  [:status :queued-at :run-time :reponame :branch :job-name :subject :build-link :workflow-link])
 
 (defn- recent [{:keys [limit cols extra-cols watch]
                 :or   {cols default-cols}
