@@ -55,3 +55,14 @@
 
 (defn bright-white [s]
   (str csi 97 suffix s reset-font))
+
+(defprotocol TermText
+  (width [this])
+  (value [this]))
+
+(defn hyperlink [url text]
+  (reify TermText
+    (width [this]
+      (count (strip text)))
+    (value [this]
+      (str "\u001b]8;;" url "\u0007" text "\u001b]8;;\u0007"))))

@@ -25,7 +25,7 @@
 (defn ->wall-str [utc-date-time]
   (when utc-date-time
     (f/unparse
-      (f/formatter-local "yyyy-MM-dd HH:mm:ssZZ")
+      (f/formatter-local "yyyy-MM-dd HH:mm:ss")
       (t/to-time-zone utc-date-time (t/default-time-zone)))))
 
 (defn ->date-time [str]
@@ -40,14 +40,14 @@
         hr (first hours)
         min (quot (last hours) seconds-in-minute)
         sec (rem (last hours) seconds-in-minute)]
-    (string/join ", "
+    (string/join \space
       (filter #(not (string/blank? %))
         (conj []
-          (when (> wk 0) (str wk " wk"))
-          (when (> d 0) (str d " d"))
-          (when (> hr 0) (str hr " hr"))
-          (when (> min 0) (str min " min"))
-          (when (> sec 0) (str sec " sec")))))))
+          (when (> wk 0) (str wk \w))
+          (when (> d 0) (str d \d))
+          (when (> hr 0) (str hr \h))
+          (when (> min 0) (str min \m))
+          (when (> sec 0) (str sec \s)))))))
 
 (defn humanized-interval [start-date end-date]
   (-> start-date

@@ -2,9 +2,20 @@
   (:require
     [io.axrs.cli-tools.ansi :as ansi]))
 
+(defn- ansi-width [v]
+  (if (satisfies? ansi/TermText v)
+    (ansi/width v)
+    (count (ansi/strip (str v)))))
+
+(defn- ansi-value [v]
+  (str (if (satisfies? ansi/TermText v)
+         (ansi/value v)
+         v)))
+
 (defn- padded [width v]
-  (let [v (str v)
-        ansi-offset (- width (count (ansi/strip v)))
+  (let [text-width (ansi-width v)
+        v (ansi-value v)
+        ansi-offset (- width text-width)
         padding (max width (+ (count v) ansi-offset))]
     (format (str "%-" padding "s") v)))
 
@@ -22,7 +33,7 @@
    (when (seq rows)
      (let [widths (map
                     (fn [k]
-                      (apply max (count (str k)) (map #(count (str (get % k))) rows)))
+                      (apply max (count (str k)) (map #(ansi-width (get % k)) rows)))
                     ks)
            rows (if formatter
                   (map formatter rows)
@@ -31,14 +42,10 @@
            fmt-row (fn [divider row]
                      (apply str (interpose divider
                                   (map padded widths (map #(get row %) ks)))))]
-       (println)
        (println (fmt-row " | " (zipmap ks ks)))
-       (println (fmt-row "-+-" (zipmap ks spacers)))
+       (println (fmt-row "-|-" (zipmap ks spacers)))
        (doseq [row rows]
          (println (fmt-row " | " row)))))))
 
 (defn clear-screen []
-  ;Clear
-  (print (str (char 27) "[2J"))
-  ;Move cursor to start
-  (print (str (char 27) "[;H")))
+  (print "\033[2J\033[3J\033[1;1H"))
