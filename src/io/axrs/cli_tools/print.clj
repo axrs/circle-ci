@@ -31,9 +31,8 @@
            fmt-row (fn [divider row]
                      (apply str (interpose divider
                                   (map padded widths (map #(get row %) ks)))))]
-       (println)
        (println (fmt-row " | " (zipmap ks ks)))
-       (println (fmt-row "-+-" (zipmap ks spacers)))
+       (println (fmt-row "-|-" (zipmap ks spacers)))
        (doseq [row rows]
          (println (fmt-row " | " row)))))))
 
