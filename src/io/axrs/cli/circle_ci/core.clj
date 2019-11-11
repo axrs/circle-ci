@@ -11,14 +11,38 @@
     [slingshot.slingshot :refer [try+ throw+]]
     [taoensso.encore :refer [assoc-some]]))
 
+(defonce ^:private project-urls (atom {}))
+
 (defn- token []
   (env/get "CIRCLECI_TOKEN"))
 
-(defn- get-recent [& [limit]]
+(defn- get-projects []
   (try+
-    (http/get-json "https://circleci.com/api/v1.1/recent-builds"
-      (assoc-some {:circle-token (token)}
-        :limit (some-> limit (min 100))))
+    (:body (http/get-json "https://circleci.com/api/v1.1/projects"
+             {:circle-token (token)}))
+    (catch http/client-error? {:as response}
+      (http/print-error response "Please ensure your CIRCLE_CI token is correct")
+      (throw+))))
+
+(defn- get-project-url [project]
+  (if-let [url (get @project-urls project)]
+    url
+    (let [urls (reduce
+                 (fn [m {:keys [username vcs-type reponame]}]
+                   (assoc m reponame (str "https://circleci.com/api/v1.1/project/" vcs-type \/ username \/ reponame)))
+                 {}
+                 (get-projects))]
+      (reset! project-urls urls)
+      (get @project-urls project))))
+
+(defn- get-recent [{:keys [limit project]}]
+  (try+
+    (when-let [url (if project
+                     (get-project-url project)
+                     "https://circleci.com/api/v1.1/recent-builds")]
+      (:body (http/get-json url
+               (assoc-some {:circle-token (token)}
+                 :limit (some-> limit (min 100))))))
     (catch http/client-error? {:as response}
       (http/print-error response "Please ensure your CIRCLE_CI token is correct")
       (throw+))))
@@ -63,26 +87,24 @@
     (comp (partial = v) k)
     any?))
 
-(defn- filter-by-params [{:keys [project branch job-name]} results]
-  (let [project? (key-match? :reponame project)
-        job-name? (key-match? :job-name job-name)
+(defn- filter-by-params [{:keys [branch job-name]} results]
+  (let [job-name? (key-match? :job-name job-name)
         branch? (key-match? :branch branch)]
-    (filter #(and (project? %)
-                  (branch? %)
+    (filter #(and (branch? %)
                   (job-name? %))
       results)))
 
 (defonce ^:private default-cols
   [:status :queued-at :run-time :reponame :branch :job-name :subject :build-link :workflow-link])
 
-(defn- recent [{:keys [limit cols extra-cols watch]
+(defn- recent [{:keys [project cols extra-cols watch]
                 :or   {cols default-cols}
                 :as   params}]
-  (let [watch? (some-> watch pos?)]
+  (let [watch? (some-> watch pos?)
+        cols (if project (remove (bp/p= :reponame) cols) cols)]
     (when watch?
       (print/clear-screen))
-    (->> (get-recent limit)
-         :body
+    (->> (get-recent params)
          clean-results
          (filter-by-params params)
          (print/table colorize (concat cols extra-cols)))
@@ -90,21 +112,30 @@
       (Thread/sleep (* 1000 watch))
       (recur params))))
 
+(defn- projects [{:as params}]
+  (->> (get-projects)
+       (sort-by :reponame)
+       (print/table colorize [:username :reponame :vcs-type :vcs-url])))
+
 (defn- cols [{:as params}]
-  (->> (get-recent 1)
-       :body
+  (->> (get-recent {:limit 1})
        first
        keys
+       (concat [:build-link :workflow-link])
        sort
        clojure.pprint/pprint))
 
 (defonce ^:private cli-config
   {:app      {:command     "circle-ci"
               :description "A CircleCI CLI"
-              :version     "0.1.1"}
-   :commands [{:command     "cols"
+              :version     "0.2.0"}
+   :commands [
+              {:command     "cols"
                :description ["Prints a list of columns available for use in tabular outputs"]
                :runs        cols}
+              {:command     "projects"
+               :description ["Prints a list of projects followed by the current CircleCI User"]
+               :runs        projects}
               {:command     "recent"
                :short       "r"
                :description ["Prints a tabular list of recent jobs"]

@@ -1,3 +1,19 @@
+# 0.2.0
+
+Added:
+* `:build-link` and `:workflow-link` columns for TERM supported hyperlinking
+* `projects` sub-command to print a list of followed projects
+
+Fixed:
+* Watch mode now clears scrollback for TERM supported terminals
+* Tables print as markdown compatible (for copying and pasting)
+* Project filter is now project specific (instead of from all recent)
+* Shortened humanised time output
+* Removed Timezone offset from formatted dates
+
+Misc:
+* Upgraded backpack dependency
+
 # 0.1.1
 
 Fixed:
