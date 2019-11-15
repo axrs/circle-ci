@@ -1,3 +1,8 @@
+# 0.3.0
+
+Added:
+* `--notify` flag to notify of a failed build during `--watch`. Supports `osascript` and `terminal-notifier`
+
 # 0.2.0
 
 Added:
