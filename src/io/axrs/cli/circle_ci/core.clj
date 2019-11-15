@@ -140,7 +140,7 @@
 (defonce ^:private cli-config
   {:app      {:command     "circle-ci"
               :description "A CircleCI CLI"
-              :version     "0.2.0"}
+              :version     "0.3.0"}
    :commands [
               {:command     "cols"
                :description ["Prints a list of columns available for use in tabular outputs"]
