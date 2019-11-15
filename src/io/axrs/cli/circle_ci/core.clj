@@ -3,6 +3,7 @@
     [cli-matic.core :as cli]
     [com.rpl.specter :as sp]
     [io.axrs.cli-tools.ansi :as ansi]
+    [io.axrs.cli-tools.notifications :as notification]
     [io.axrs.cli-tools.env :as env]
     [io.axrs.cli-tools.http :as http]
     [io.axrs.cli-tools.print :as print]
@@ -97,17 +98,28 @@
 (defonce ^:private default-cols
   [:status :queued-at :run-time :reponame :branch :job-name :subject :build-link :workflow-link])
 
-(defn- recent [{:keys [project cols extra-cols watch]
+(defonce ^:private notified (atom #{}))
+
+(defn- recent [{:keys [project cols extra-cols watch notify]
                 :or   {cols default-cols}
                 :as   params}]
   (let [watch? (some-> watch pos?)
+        notify? (and watch? (some-> notify pos?))
         cols (if project (remove (bp/p= :reponame) cols) cols)]
     (when watch?
       (print/clear-screen))
-    (->> (get-recent params)
-         clean-results
-         (filter-by-params params)
-         (print/table colorize (concat cols extra-cols)))
+    (let [results (->> (get-recent params)
+                       clean-results
+                       (filter-by-params params))]
+      (when notify?
+        (doseq [{:keys [reponame branch job-name run-time build-url subject]} (filter (comp (bp/p= "failed") :status) results)]
+          (when (not (contains? @notified build-url))
+            (notification/send {:message  subject
+                                :subtitle (str job-name " failed (" run-time ")")
+                                :url      build-url
+                                :title    (str reponame " | " branch)})
+            (swap! notified conj build-url))))
+      (print/table colorize (concat cols extra-cols) results))
     (when watch?
       (Thread/sleep (* 1000 watch))
       (recur params))))
@@ -158,6 +170,9 @@
                              {:option "extra-cols"
                               :as     "Extra columns to print (appended to the end of cols)"
                               :type   :edn}
+                             {:option "notify"
+                              :as     "Display system notification for failed builds"
+                              :type   :int}
                              {:option "watch"
                               :as     "The number of seconds to wait before refresh"
                               :type   :int}]
