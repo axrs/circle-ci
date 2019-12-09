@@ -1,3 +1,13 @@
+# 0.3.1
+
+Fixed:
+* Intermittent crash caused by The end instant must be greater than the start instant #6
+
+Misc:
+* Updated `backpack` to `4.0.1`
+* Updated `clj-time` to `0.15.2`
+* Updated `encore` to `2.117.0`
+
 # 0.3.0
 
 Added:
@@ -17,7 +27,7 @@ Fixed:
 * Removed Timezone offset from formatted dates
 
 Misc:
-* Upgraded backpack dependency
+* Upgraded `backpack` dependency
 
 # 0.1.1
 
