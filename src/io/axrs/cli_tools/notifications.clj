@@ -1,6 +1,9 @@
 (ns io.axrs.cli-tools.notifications
   (:refer-clojure :exclude [send])
-  (:require [clojure.java.shell :as sh]))
+  (:require
+    [io.jesi.backpack.macros :refer [def-]]
+    [clojure.java.shell :as sh]
+    [clojure.string :as string]))
 
 (defn- clean-exit? [{:keys [exit]}]
   (zero? exit))
@@ -25,7 +28,17 @@
     (clean-exit? (sh/sh "osascript" "-e" (str "display notification \"" message "\" with title \"" title "\""
                                            (when subtitle (str " subtitle \"" subtitle "\"")))))))
 
+(def- non-blank? (complement string/blank?))
+
+(defn- optional-non-empty-string [s]
+  (or (nil? s)
+      (non-blank? s)))
+
 (defn send [{:keys [message title subtitle url] :as notification}]
-  (or
-    (terminal-notifier notification)
-    (osascript notification)))
+  {:pre [(non-blank? message)
+         (non-blank? title)
+         (optional-non-empty-string subtitle)
+         (optional-non-empty-string url)]
+   (or
+     (terminal-notifier notification)
+     (osascript notification))})
