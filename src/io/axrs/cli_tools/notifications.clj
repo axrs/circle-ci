@@ -38,7 +38,7 @@
   {:pre [(non-blank? message)
          (non-blank? title)
          (optional-non-empty-string subtitle)
-         (optional-non-empty-string url)]
-   (or
-     (terminal-notifier notification)
-     (osascript notification))})
+         (optional-non-empty-string url)]}
+  (or
+    (terminal-notifier notification)
+    (osascript notification)))
