@@ -113,7 +113,8 @@
                        (filter-by-params params))]
       (when notify?
         (doseq [{:keys [reponame branch job-name run-time build-url subject]} (filter (comp (bp/p= "failed") :status) results)]
-          (when-not (contains? @notified build-url)
+          (when (and subject
+                     (not (contains? @notified build-url)))
             (notification/send {:message  subject
                                 :subtitle (str job-name " failed (" run-time ")")
                                 :url      build-url
@@ -140,7 +141,7 @@
 (defonce ^:private cli-config
   {:app      {:command     "circle-ci"
               :description "A CircleCI CLI"
-              :version     "0.3.1"}
+              :version     "0.3.2"}
    :commands [
               {:command     "cols"
                :description ["Prints a list of columns available for use in tabular outputs"]

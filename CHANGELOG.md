@@ -1,3 +1,11 @@
+# 0.3.2
+
+Fixed:
+* Intermittent crash caused by attempting to show a notification without a subject
+
+Misc:
+* Updated `backpack` to `4.2.0`
+
 # 0.3.1
 
 Fixed:
